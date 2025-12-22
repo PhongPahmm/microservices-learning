@@ -4,6 +4,8 @@ import com.example.userservice.dto.UserDTO;
 import com.example.userservice.model.User;
 import com.example.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +18,7 @@ public class UserController {
     private final UserRepository userRepository;
 
     @PostMapping
+    @CacheEvict(value = "allUsers", allEntries = true)
     public User createUser(@RequestBody User user) {
         return userRepository.save(user);
     }
@@ -33,7 +36,9 @@ public class UserController {
 
     }
     @GetMapping
+    @Cacheable("allUsers")
     public List<User> getAllUsers() {
+        System.out.println("Query all users from database");
         return userRepository.findAll();
     }
 }
