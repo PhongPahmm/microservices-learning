@@ -12,5 +12,6 @@
         <module>discovery-server</module>
         <module>order-service</module>
         <module>user-service</module>
+        <module>notification-service</module>
     </modules>
 </project>
