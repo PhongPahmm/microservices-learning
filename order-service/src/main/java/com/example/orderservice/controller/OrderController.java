@@ -2,10 +2,12 @@ package com.example.orderservice.controller;
 
 import com.example.orderservice.client.UserClient;
 import com.example.orderservice.dto.OrderResponse;
+import com.example.orderservice.dto.UserDTO;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.repository.OrderRepository;
 import com.example.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,9 +23,14 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public Order placeOrder(@RequestBody Order order) {
+    public Order placeOrder(@RequestBody Order order, JwtAuthenticationToken auth) {
+        String sub = auth.getToken().getSubject(); // lấy Keycloak-sub (UUID)
+        UserDTO user = userClient.getUserByKeycloakId(sub); // Feign gọi user-service
+
+        order.setUserId(user.getId()); // gán Long userId
         return orderService.createOrder(order);
     }
+
     @GetMapping("/{id}")
     public OrderResponse getOrderById(@PathVariable Long id) {
         Order order = orderRepository.findById(id)
